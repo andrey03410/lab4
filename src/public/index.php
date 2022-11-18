@@ -10,7 +10,7 @@ $service = new Google_Service_Sheets($client);
 $id = "1Oa-tU8u6X3qgs6BPc4cD8IijhgeELk6UqjdIg2Fvbus";
 
 
-$range = "data!A1:D1";
+$range = "A1:D1";
 $valueRange = new Google_Service_Sheets_ValueRange();
 $valueRange->setValues(["values" => ["title", "name", "description", "email"]]);
 $params = ["valueInputOption" => "RAW"];
@@ -25,7 +25,7 @@ $service->spreadsheets_values->update($id, $range, $valueRange, $params);
 <?php
 if(isset($_POST['submit'])){
     $title = $_POST['title'];
-    $range = "titles!A1";
+    $range = "A1";
     $valueRange = new Google_Service_Sheets_ValueRange([
         'values' => [[$title]]
     ]);
@@ -37,7 +37,7 @@ if(isset($_POST['submit'])){
     <form action='index.php' method='post'>
         <select name='title'>
             <?php
-            $range = "titles!A2:A";
+            $range = "A2:A";
             $response = $service->spreadsheets_values->get($id, $range);
             $values = $response->getValues();
             if (count($values) == 0) {
@@ -61,11 +61,11 @@ if(isset($_POST['name'])){
     $name = $_POST['name'];
     $description = $_POST['description'];
     $email = $_POST['email'];
-    $range = "data!A2:D";
+    $range = "A2:D";
     $response = $service->spreadsheets_values->get($id, $range);
     $values = $response->getValues();
     $row = count($values) + 1;
-    $range = "data!A$row:D$row";
+    $range = "A$row:D$row";
     $valueRange = new Google_Service_Sheets_ValueRange([
         'values' => [[$title, $name, $description, $email]]
     ]);
@@ -75,7 +75,7 @@ if(isset($_POST['name'])){
 ?>
 
 <?php
-$range = "data!A2:D";
+$range = "A2:D";
 $response = $service->spreadsheets_values->get($id, $range);
 $values = $response->getValues();
 if (count($values) == 0) {
