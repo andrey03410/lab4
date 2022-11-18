@@ -2,7 +2,6 @@
 <module type="WEB_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
-      <excludeFolder url="file://$MODULE_DIR$/src/public/vendor/psr/cache" />
       <excludeFolder url="file://$MODULE_DIR$/src/public/vendor/psr/http-client" />
       <excludeFolder url="file://$MODULE_DIR$/src/public/vendor/psr/http-factory" />
       <excludeFolder url="file://$MODULE_DIR$/src/public/vendor/psr/http-message" />
@@ -21,6 +20,7 @@
       <excludeFolder url="file://$MODULE_DIR$/src/public/vendor/guzzlehttp/promises" />
       <excludeFolder url="file://$MODULE_DIR$/src/public/vendor/composer" />
       <excludeFolder url="file://$MODULE_DIR$/src/public/vendor/guzzlehttp/psr7" />
+      <excludeFolder url="file://$MODULE_DIR$/src/public/vendor/psr/cache" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

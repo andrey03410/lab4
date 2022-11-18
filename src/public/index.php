@@ -1,85 +1,94 @@
 <?php
-if (!file_exists('./data')) {
-    mkdir('./data');
-}
-?>
-<h1>Добавить название категории</h1>
-<form action="index.php" method="post">
-    <input type="text" name="category" placeholder="Название категории">
-    <input type="submit" value="Добавить">
-</form>
-<?php
-if (!empty($_POST['category'])) {
-    $category = $_POST['category'];
-    $path = "./data/" . $category;
-    if (!file_exists($path)) {
-        mkdir($path);
-    }
-}
 
-?>
-<h1>Добавить объявление</h1>
-<form action="index.php" method="post">
-    <input type="text" name="title" placeholder="Заголовок объявления">
-    <textarea name="text" cols="30" rows="10" placeholder="Текст объявления"></textarea>
-    <input type="text" name="email" placeholder="Email">
-    <select name="category">
-        <?php
-        $dir = "./data/";
-        $files = scandir($dir);
-        foreach ($files as $file) {
-            if ($file != "." && $file != "..") {
-                echo "<option value='$file'>$file</option>";
-            }
-        }
-        ?>
-    </select>
-    <input type="submit" value="Добавить">
-</form>
-<?php
+require_once "vendor/autoload.php";
 
-if (!empty($_POST['category']) && !empty($_POST['title']) && !empty($_POST['text']) && !empty($_POST['email'])) {
-    $category = $_POST['category'];
+$client = new Google_Client();
+$client->setApplicationName('Google Sheets');
+$client->setScopes(Google_Service_Sheets::SPREADSHEETS);
+$client->setAuthConfig('test1-369017-7627fc6e137d.json');
+$service = new Google_Service_Sheets($client);
+$id = "1Oa-tU8u6X3qgs6BPc4cD8IijhgeELk6UqjdIg2Fvbus";
+
+
+$range = "data!A1:D1";
+$valueRange = new Google_Service_Sheets_ValueRange();
+$valueRange->setValues(["values" => ["title", "name", "description", "email"]]);
+$params = ["valueInputOption" => "RAW"];
+$service->spreadsheets_values->update($id, $range, $valueRange, $params);
+?>
+
+    <form action='index.php' method='post'>
+        <input type='text' name='title' placeholder='title'>
+        <input type='submit' name='submit' value='submit'>
+    </form>
+
+<?php
+if(isset($_POST['submit'])){
     $title = $_POST['title'];
-    $text = $_POST['text'];
-    $email = $_POST['email'];
-    $path = "./data/" . $category . "/" . $title . ".txt";
-    if (!file_exists($path)) {
-        $file = fopen($path, "w");
-        fwrite($file, $text . "\n" . $email);
-        fclose($file);
-    }
+    $range = "titles!A1";
+    $valueRange = new Google_Service_Sheets_ValueRange([
+        'values' => [[$title]]
+    ]);
+    $conf = ['valueInputOption' => 'RAW'];
+    $service->spreadsheets_values->append($id, $range, $valueRange, $conf);
 }
 ?>
-<h1>Список объявлений</h1>
 
-<table>
-    <tr>
-        <th>title</th>
-        <th>description</th>
-        <th>category</th>
-    </tr>
-    <?php
-    $files = scandir($dir);
-    foreach ($files as $file) {
-        if ($file != "." && $file != "..") {
-            $path = "./data/" . $file;
-            $files2 = scandir($path);
-            foreach ($files2 as $file2) {
-                if ($file2 != "." && $file2 != "..") {
-                    $path2 = "./data/" . $file . "/" . $file2;
-                    $file3 = fopen($path2, "r");
-                    $text = fgets($file3);
-                    $email = fgets($file3);
-                    fclose($file3);
-                    echo "<tr>";
-                    echo "<td>" . substr($file2, 0 , -4) . "</td>";
-                    echo "<td>" . $text . "</td>";
-                    echo "<td>" . $file . "</td>";
-                    echo "</tr>";
+    <form action='index.php' method='post'>
+        <select name='title'>
+            <?php
+            $range = "titles!A2:A";
+            $response = $service->spreadsheets_values->get($id, $range);
+            $values = $response->getValues();
+            if (count($values) == 0) {
+                echo "No data found.";
+            } else {
+                foreach ($values as $row) {
+                    echo "<option value='$row[0]'>$row[0]</option>";
                 }
             }
+            ?>
+        </select>
+        <input type='text' name='name' placeholder='name'>
+        <input type='text' name='description' placeholder='description'>
+        <input type='text' name='email' placeholder='email'>
+        <input type='submit' value='Submit'>
+    </form>
+
+<?php
+if(isset($_POST['name'])){
+    $title = $_POST['title'];
+    $name = $_POST['name'];
+    $description = $_POST['description'];
+    $email = $_POST['email'];
+    $range = "data!A2:D";
+    $response = $service->spreadsheets_values->get($id, $range);
+    $values = $response->getValues();
+    $row = count($values) + 1;
+    $range = "data!A$row:D$row";
+    $valueRange = new Google_Service_Sheets_ValueRange([
+        'values' => [[$title, $name, $description, $email]]
+    ]);
+    $conf = ['valueInputOption' => 'RAW'];
+    $service->spreadsheets_values->append($id, $range, $valueRange, $conf);
+}
+?>
+
+<?php
+$range = "data!A2:D";
+$response = $service->spreadsheets_values->get($id, $range);
+$values = $response->getValues();
+if (count($values) == 0) {
+    echo "No data found.";
+} else {
+    echo "<table>";
+    foreach ($values as $row) {
+        echo "<tr>";
+        foreach ($row as $value) {
+            echo "<td>$value</td>";
         }
+        echo "</tr>";
     }
-    ?>
-</table>
+    echo "</table>";
+}
+?>
